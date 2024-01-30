@@ -1,20 +1,24 @@
-const jwt = require('jsonwebtoken');
-const { secret } = require('../crypto/config');
+const jwt = require('jsonwebtoken')
+const hashedSecret = require('../crypto/config')
 
-function authMiddleware(req, res, next) {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(403).send('Token requerido');
-  }
-
-  try {
-    const decoded = jwt.verify(token, secret);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).send('Token inválido');
-  }
+function generateToken (user) {
+  return jwt.sign({ user: user.id}, hashedSecret, {expiresIn: '1h'})
 }
 
-module.exports = authMiddleware;
+function verifyToken(req, res, next) {
+  const token = req.session.token
+  if(!token) {
+    return res.status(401).json({mensaje: 'token no generado'})
+  }
+  
+  jwt.verify(token, hashedSecret, (err, decoded) => {
+    if(err) {
+      return res.status(401).json({mensaje: 'token invalido'})
+    }
+    req.user = decoded.user
+    next()
+  })
+}
+
+module.exports = {generateToken, verifyToken}
+

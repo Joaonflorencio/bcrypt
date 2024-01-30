@@ -1,12 +1,6 @@
-const users = require('./users.json');
-const bcrypt = require('bcrypt');
+const users = [
+  { id: 1, username: 'usuario1', password: 'contraseña1', name: 'Usuario Uno' },
+  { id: 2, username: 'usuario2', password: 'contraseña2', name: 'Usuario Dos' },
+];
 
-function verifyCredentials(username, password) {
-  const user = users.find(u => u.username === username);
-  if (user && bcrypt.compareSync(password, user.password)) {
-    return user;
-  }
-  return null;
-}
-
-module.exports = { verifyCredentials };
+module.exports = users;

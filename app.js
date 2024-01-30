@@ -1,14 +1,22 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const userRoutes = require('./routes/users');
-const app = express();
+const express = require('express')
+const app = express()
+const session = require('express-session')
+const hashedSecret = require('./crypto/config')
+const route = require('./routes/users')
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(
+  session({
+    secret: hashedSecret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false}
+  })
+)
 
-app.use('/', userRoutes);
+app.use('/', route)
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(3000, () => {
+  console.log('Express está escuchando en el puerto http://localhost:3000')
+})
